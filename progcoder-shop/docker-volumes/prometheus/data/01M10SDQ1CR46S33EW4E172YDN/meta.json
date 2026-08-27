@@ -1,0 +1,17 @@
+{
+	"ulid": "01M10SDQ1CR46S33EW4E172YDN",
+	"minTime": 1787796000320,
+	"maxTime": 1787803200000,
+	"stats": {
+		"numSamples": 1055001,
+		"numSeries": 2766,
+		"numChunks": 8260
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01M10SDQ1CR46S33EW4E172YDN"
+		]
+	},
+	"version": 1
+}

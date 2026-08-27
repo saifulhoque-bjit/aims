@@ -1,0 +1,51 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "manifestVersion": "2.0.0",
+  "signatureType": "community",
+  "signedByOrg": "flant",
+  "signedByOrgName": "flant",
+  "plugin": "flant-statusmap-panel",
+  "version": "0.5.1",
+  "time": 1651742250067,
+  "keyId": "7e4d0c6a708866e7",
+  "files": {
+    "dark.js.map": "187be3fbc2cb4edaab56fad3e1baf85259e062195e65e1bfcd0171beeaec8c65",
+    "module.js": "69c76c411f43399ce7462912e2d9bb72f5ab8f825fe1c82c36bdad5d9504cfc7",
+    "dark.js": "e212c1e67fe8fb79ec9c39e885b2528cbcff5e16267d3a4a8b2f6329b8f6b516",
+    "partials/options_editor.html": "9a50cdafedd28dc45ce3a8fb11974f849871f7739bd684a5960ae73f2fc1e330",
+    "partials/about_editor.html": "e00e3ff926173ff92f498f8b353f58d6333e97c0a3750318b5ba371c30bc24ea",
+    "partials/tooltip_editor.html": "8a0ba58f3afe5c6c84781bf5859fca40188fed7ec022b9d5e822adc461c6e51b",
+    "plugin.json": "50eb139651c949b78003eec5b0284b1918fca677eb9341c4420eec32bce4ca21",
+    "styles/light.css": "c304a15fab0bbf22c32033ac969174747560c7158bf4d89b1e9dadca6900ca74",
+    "styles/dark.css": "975a5a275a37086c77ce5b5ed068d85ccd555e05a79c751a5666b1eac301f8d7",
+    "module.html": "b5d9c81fc91d5fae83320243fc7af4532c5c6cc93ef26835d841423b9f0cd757",
+    "module.js.map": "aae6174e0c52e33436fc40852a893a05fb6259f7756248db4184668c17c6a9c7",
+    "light.js.map": "e0d449826e6780baa0bbf1781e3a8f5b2ccafde50645f171077a0d56c8514053",
+    "CHANGELOG.md": "c2c4789bc37f52a4d715d25c22ddddf61f9399f1adcfb053fbd4a58b7477de7a",
+    "module.js.LICENSE.txt": "0d8f66cd4afb566cb5b7e1540c68f43b939d3eba12ace290f18abc4f4cb53ed0",
+    "light.js": "066b4d5138cb70c37f346257ac8ef4ca5cc62db27affcc7e808f890f33982e1d",
+    "LICENSE": "c84b3116fe21267d9205871d205cb3b560682074c9c0e8df5d800e1a06cdc830",
+    "img/logo.svg": "41f46e08d75d0cc0bd575fc260b5baff9286db45a43fce2213cc9dcc629e0d02",
+    "img/flant-statusmap-panel-dark.png": "92cb924fed0b53aa736b164cabbca64e7323577ea7226da79afccbed6e641bf2",
+    "img/flant-statusmap-panel.png": "ccc16fb1e8fefd26e5cdb4e2fa7ef1244e1e39a34e4cafaa5757ad75137c34ac",
+    "img/queries-example.png": "6e34ce07e8beaf706d2b73eda90d2d31d8a380ee73ec0d6715e87c2b576d2104",
+    "img/flant_corner.svg": "c4999a94e349946036fa2a995682e1c6891783fe30beb24fd9c60b3dc22c9f55",
+    "img/statusmap_icon.svg": "4a8aa388abccd6347c217d713a02a2a05b0487ff32b92925d03f50611ad184c2",
+    "img/color-mapping.png": "90116639c24f0056f67333304f188b83de2646d32594da364840f5e2f3cc247a",
+    "README.md": "825f32d868367665907043b4d535bfef6e60b55c6c94a40273fe723712568c79"
+  }
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.10
+Comment: https://openpgpjs.org
+
+wrkEARMKAAYFAmJzlioAIQkQfk0ManCIZucWIQTzOyW2kQdOhGNlcPN+TQxq
+cIhm53NDAgkB55ZuLR+KcGuqFR0Th5F/7xY4XMMagkxAWRmgBuPKtfTy4s8h
+P5WeW5/hdNey1EpJPjkyiqt3oQdC3D4C6u2LaSICCQGhAhpqsV5V4nK0C62q
+rmMXk0oGpoFM8l9vlLig52ofmaNqkEKYOKoSZ7X7WCqkrgB/aBMxuZjjx5Yt
++V4ylLRWZw==
+=eZNc
+-----END PGP SIGNATURE-----
