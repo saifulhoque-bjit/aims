@@ -79,7 +79,8 @@ services:
     ports:
       - ${KEYCLOAK_PORT}:8080
     depends_on:
-      - postgres-sql
+      postgres-sql:
+        condition: service_healthy
     networks:
       - progcoder_network
 
@@ -190,10 +191,19 @@ services:
     ports:
       - ${CATALOG_API_PORT}:8080
     depends_on:
-      - postgres-sql
-      - keycloak
-      - minio
-      - otel-collector
+      # Gate on health, not just container start: Postgres accepts TCP and the
+      # container reports "created" long before it answers queries, which is
+      # what produced the Npgsql 57P03 burst on every cold start. The API also
+      # re-checks readiness itself (DatabaseReadiness in appsettings.json) so
+      # this is defense in depth, not the only guard.
+      postgres-sql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      otel-collector:
+        condition: service_started
     networks:
       - progcoder_network
     healthcheck:
