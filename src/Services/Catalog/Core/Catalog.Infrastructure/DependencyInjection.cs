@@ -1,5 +1,7 @@
 ﻿#region using
 
+using Catalog.Application.Services;
+using Catalog.Infrastructure.Services;
 using Marten;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +25,12 @@ public static class DependencyInjection
             opts.Connection(cfg[$"{ConnectionStringsCfg.Section}:{ConnectionStringsCfg.Database}"]!);
             opts.UseSystemTextJsonForSerialization();
         }).UseLightweightSessions();
+
+        // Explicit rather than the assembly scan: the scan picks up classes
+        // ending in "Service"/"Repository", but this one takes IDocumentStore
+        // (a singleton) and must be resolvable from the root provider by the
+        // startup readiness gate.
+        services.AddSingleton<IDatabaseReadinessService, DatabaseReadinessService>();
 
         services.Scan(s => s
             .FromAssemblyOf<InfrastructureMarker>()
