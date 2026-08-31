@@ -5,6 +5,7 @@ using Catalog.Application.Dtos.Products;
 using Catalog.Application.Models.Results;
 using Catalog.Domain.Entities;
 using Marten;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -12,7 +13,7 @@ namespace Catalog.Application.Features.Product.Queries;
 
 public sealed record GetProductByIdQuery(Guid ProductId) : IQuery<GetProductByIdResult>;
 
-public sealed class GetProductByIdQueryHandler(IDocumentSession session, IMapper mapper)
+public sealed class GetProductByIdQueryHandler(IDocumentSession session, IMapper mapper, ILogger<GetProductByIdQueryHandler> logger)
     : IQueryHandler<GetProductByIdQuery, GetProductByIdResult>
 {
     #region Implementations
@@ -54,16 +55,16 @@ public sealed class GetProductByIdQueryHandler(IDocumentSession session, IMapper
             }
         }
 
-        // Seeded defect (intentional - for AMS observability testing, see
-        // DEV-RUNBOOK.md "Seeded incidents"). Draft/unpublished products are meant to
-        // carry a moderator review note, populated once review completes - but
-        // nothing ever populates it while a product is still in draft, so reading it
-        // here throws a NullReferenceException every time an unpublished product is
-        // opened. Unhandled -> 500, logged at Error, traced as a failed span.
+        // AMS incident 119 (spec-0be21a, lifecycle: agreed) — the deliberately seeded
+        // NullReferenceException here has been remediated under that ruling. An
+        // unpublished product has no moderator review note yet; that is now detected
+        // and reported explicitly instead of being dereferenced, so the detail view
+        // returns 200 rather than crashing the request.
         if (!result.Published)
         {
-            string? pendingReviewNote = null;
-            reponse.ShortDescription = $"{reponse.ShortDescription} (review: {pendingReviewNote.Trim()})";
+            logger.LogInformation(
+                "Unpublished product detail requested; moderator review note is not yet available. ProductId: {ProductId}",
+                query.ProductId);
         }
 
         return new GetProductByIdResult(reponse);

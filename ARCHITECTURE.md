@@ -6,7 +6,7 @@ Everything below reflects what was actually exercised in the session that built 
 
 | | | | |
 |---|---|---|---|
-| **10** containers | **1** non-Docker process | **2** seeded defects (1 live) | commit `304172f` · 2026-08-10 |
+| **10** containers | **1** non-Docker process | **2** seeded defects (1 live, 1 remediated) | commit `304172f` · 2026-08-10 |
 
 ## Topology
 
@@ -131,7 +131,7 @@ What's confirmed running in this slice.
 
 | Status | Use case |
 |---|---|
-| 🔺 seeded · live | Opening any **unpublished** product's detail view → `NullReferenceException` → HTTP 500 + Error log + error-tagged span |
+| ⬛ remediated | Opening any **unpublished** product's detail view → `NullReferenceException` → HTTP 500 + Error log + error-tagged span. Fixed under the AMS incident-119 ruling (spec-0be21a, lifecycle `agreed`): the review-note read is null-guarded and the missing note is reported instead of dereferenced. |
 | 🔺 seeded · live | Any product with `SalePrice = 0` → `DivideByZeroException` on the *entire* admin product list, not just that item. "Dell XPS 15" is the currently-poisoned record. |
 
 ### AMS monitor (standalone, non-Docker)

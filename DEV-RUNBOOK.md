@@ -119,6 +119,16 @@ Seeded products are created `Published=false`; publish them individually via
 only writes to Catalog's own outbox table now - there's no worker left to
 forward it anywhere, since Search and RabbitMQ were both cut).
 
+## Seeded incidents
+
+Two defects are deliberately kept in the code as detectable signals for the AMS
+observability pipeline. Their current state:
+
+| Incident | Signal | Status |
+|---|---|---|
+| 119 | `GetProductByIdQueryHandler` dereferenced a null moderator-review note for unpublished products → `NullReferenceException` → HTTP 500, Error log, error-tagged span | **Remediated** under the spec-0be21a ruling (lifecycle `agreed`): the read is null-guarded, the missing note is reported in a log entry, and the detail view returns 200. Ruled as a controlled, equivalent replacement signal rather than a loss of coverage. |
+| — | `GetAllProductsQueryHandler` divides by `SalePrice = 0` when computing a discount badge → `DivideByZeroException` for the whole admin product list ("Dell XPS 15" is the poisoned record) | Still **live** by design. Do not remediate without a ruling. |
+
 ## Known gaps in this slice
 
 - **Everything else in Admin's sidebar is a dead link or a dead page.**
