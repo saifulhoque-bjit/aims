@@ -1,0 +1,18 @@
+# .NET build artifacts
+bin/
+obj/
+*.user
+TestResults/
+.artifacts/
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# Env
+.env
