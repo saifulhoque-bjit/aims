@@ -77,17 +77,14 @@ public sealed class GetAllProductsQueryHandler(IDocumentSession session, IMapper
                     }
                 }
 
-                // Seeded defect (intentional - second AMS observability test case, see
-                // DEV-RUNBOOK.md "Seeded incidents"). SalePrice is optional and has no
-                // validation (see UpdateProductCommandValidator), so an admin can set it
-                // to 0 for a "100% off" clearance item. Computing the discount badge
-                // percentage then divides by that zero sale price, throwing
-                // DivideByZeroException for the whole product list, not just the one
-                // poisoned item.
-                if (item.SalePrice == 0)
+                // Discount badge. SalePrice is optional and has no validation (see
+                // UpdateProductCommandValidator), so an admin can set it to 0 for a
+                // "100% off" clearance item. A zero (or negative) sale price carries no
+                // derivable discount, so the badge is skipped instead of dividing by
+                // that zero and failing the whole product list.
+                if (DiscountBadge.Build(item.Price, item.SalePrice) is { } badge)
                 {
-                    var discountPercentage = (item.Price - item.SalePrice.Value) / item.SalePrice.Value * 100;
-                    item.ShortDescription = $"{item.ShortDescription} (-{discountPercentage}% off)";
+                    item.ShortDescription = $"{item.ShortDescription} {badge}";
                 }
             }
         }

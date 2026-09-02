@@ -6,7 +6,7 @@ Everything below reflects what was actually exercised in the session that built 
 
 | | | | |
 |---|---|---|---|
-| **10** containers | **1** non-Docker process | **2** seeded defects (1 live) | commit `304172f` · 2026-08-10 |
+| **10** containers | **1** non-Docker process | **2** seeded defects (0 live) | commit `304172f` · 2026-08-10 |
 
 ## Topology
 
@@ -132,7 +132,7 @@ What's confirmed running in this slice.
 | Status | Use case |
 |---|---|
 | 🔺 seeded · live | Opening any **unpublished** product's detail view → `NullReferenceException` → HTTP 500 + Error log + error-tagged span |
-| 🔺 seeded · live | Any product with `SalePrice = 0` → `DivideByZeroException` on the *entire* admin product list, not just that item. "Dell XPS 15" is the currently-poisoned record. |
+| ✅ fixed | Any product with `SalePrice = 0` used to throw `DivideByZeroException` on the *entire* admin product list ("Dell XPS 15" was the poisoned record). The discount badge now skips non-derivable discounts — covered by `tests/Catalog.Application.Tests`. |
 
 ### AMS monitor (standalone, non-Docker)
 
