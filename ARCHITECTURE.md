@@ -131,7 +131,7 @@ What's confirmed running in this slice.
 
 | Status | Use case |
 |---|---|
-| 🔺 seeded · live | Opening any **unpublished** product's detail view → `NullReferenceException` → HTTP 500 + Error log + error-tagged span |
+| 🔺 seeded · live · fix wanted | Opening any **unpublished** product's detail view → `NullReferenceException` → HTTP 500 + Error log + error-tagged span |
 | ✅ fixed | Any product with `SalePrice = 0` used to throw `DivideByZeroException` on the *entire* admin product list ("Dell XPS 15" was the poisoned record). The discount badge now skips non-derivable discounts — covered by `tests/Catalog.Application.Tests`. |
 
 ### AMS monitor (standalone, non-Docker)
