@@ -18,7 +18,7 @@
 
 This is a deliberately minimal observability slice built to give an AI monitoring agent (AMS) real signals. Two defects were **intentionally seeded** and documented in `ARCHITECTURE.md` under "AMS seeded incidents":
 
-1. `GetProductByIdQuery` — `NullReferenceException` on unpublished products (still live, left alone).
+1. `GetProductByIdQuery` — `NullReferenceException` on unpublished products (still live; the owner now wants it fixed — an AMS fix pull request for it is welcome).
 2. `GetAllProductsQuery` — `DivideByZeroException` when `SalePrice = 0` (fixed in PR #4).
 
-If an incident ticket points at one of these, check whether the ticket is the monitoring drill itself before fixing. Fixing them removes the signal the stack exists to produce.
+Both defects may be fixed. An AMS fix pull request for the `GetProductByIdQuery` defect is wanted; the owner decides when to merge it.
