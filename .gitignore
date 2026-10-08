@@ -16,3 +16,6 @@ dist/
 
 # Env
 .env
+
+# Local runtime data and secrets: never committed
+docker-volumes/
