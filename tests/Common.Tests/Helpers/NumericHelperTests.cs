@@ -25,7 +25,17 @@ public class NumericHelperTests
         { 1500d, -10d },
         // Sale at or above the original price - nothing is being discounted.
         { 1500d, 1500d },
-        { 1500d, 2000d }
+        { 1500d, 2000d },
+        // Non-finite input - NaN comparisons are always false and infinity
+        // produces a NaN percentage, which must not be cast to int.
+        { double.NaN, 100d },
+        { 200d, double.NaN },
+        { double.NaN, double.NaN },
+        { double.PositiveInfinity, 100d },
+        { 200d, double.PositiveInfinity },
+        { double.PositiveInfinity, double.PositiveInfinity },
+        { double.NegativeInfinity, 100d },
+        { 200d, double.NegativeInfinity }
     };
 
     #endregion

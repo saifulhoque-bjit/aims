@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     Discount percentage helper. Prices are unvalidated input, so a zero or
-///     non-positive original price yields no discount instead of a divide-by-zero
+///     non-positive or non-finite price yields no discount instead of a divide-by-zero
 ///     that fails the caller's request.
 /// </summary>
 public static class NumericHelper
@@ -11,7 +11,8 @@ public static class NumericHelper
 
     public static int CalculateDiscountPercent(double originalPrice, double salePrice)
     {
-        if (originalPrice <= 0 || salePrice <= 0 || salePrice >= originalPrice)
+        if (!double.IsFinite(originalPrice) || !double.IsFinite(salePrice) ||
+            originalPrice <= 0 || salePrice <= 0 || salePrice >= originalPrice)
         {
             return 0;
         }
