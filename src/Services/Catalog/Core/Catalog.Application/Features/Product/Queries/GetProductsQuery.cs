@@ -7,6 +7,7 @@ using Catalog.Application.Models.Results;
 using Catalog.Domain.Entities;
 using Marten;
 using Marten.Pagination;
+using System.Text.RegularExpressions;
 
 #endregion
 
@@ -26,10 +27,12 @@ public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper ma
         var filter = query.Filter;
         var paging = query.Paging;
         var productQuery = session.Query<ProductEntity>().AsQueryable();
+        Regex? relevance = null;
 
         if (!filter.SearchText.IsNullOrWhiteSpace())
         {
             var search = filter.SearchText.Trim();
+            relevance = new Regex(search, RegexOptions.IgnoreCase);
             productQuery = productQuery.Where(x => x.Name != null && x.Name.Contains(search));
         }
         if (filter.Ids?.Length > 0)
@@ -83,6 +86,14 @@ public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper ma
                     }
                 }
             }
+        }
+
+        // Names where the search text matches earliest come first on the page.
+        if (relevance != null)
+        {
+            items = items
+                .OrderBy(i => relevance.Match(i.Name ?? string.Empty) is { Success: true } m ? m.Index : int.MaxValue)
+                .ToList();
         }
 
         var reponse = new GetProductsResult(items, totalCount, paging);

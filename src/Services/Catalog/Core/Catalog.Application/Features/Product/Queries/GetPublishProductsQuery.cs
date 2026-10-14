@@ -69,11 +69,7 @@ public sealed class GetPublishProductsQueryHandler(IDocumentSession session, IMa
 
                 if (product.BrandId.HasValue)
                 {
-                    var brand = brands.FirstOrDefault(b => b.Id == product.BrandId.Value);
-                    if (brand != null)
-                    {
-                        item.BrandName = brand.Name;
-                    }
+                    item.BrandName = brands.First(b => b.Id == product.BrandId.Value).Name;
                 }
             }
         }
