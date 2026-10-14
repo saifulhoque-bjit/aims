@@ -100,7 +100,7 @@ public class CreateProductCommandHandler(IMapper mapper,
         // Without an explicit SEO title, fall back to the product name cut to the
         // 60-character limit search engines show.
         var seoTitle = dto.SEOTitle.IsNullOrWhiteSpace()
-            ? dto.Name!.Substring(0, SeoTitleMaxLength)
+            ? dto.Name!.Substring(0, Math.Min(dto.Name!.Length, SeoTitleMaxLength))
             : dto.SEOTitle;
         entity.UpdateSEO(seoTitle, dto.SEODescription, command.Actor.ToString());
         entity.UpdateFeatured(dto.Featured, command.Actor.ToString());
