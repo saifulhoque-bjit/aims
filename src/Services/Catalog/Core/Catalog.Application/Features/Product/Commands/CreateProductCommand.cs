@@ -61,6 +61,12 @@ public class CreateProductCommandHandler(IMapper mapper,
     IMinIOCloudService minIO,
     ISender sender) : ICommandHandler<CreateProductCommand, Guid>
 {
+    #region Fields, Properties and Indexers
+
+    private const int SeoTitleMaxLength = 60;
+
+    #endregion
+
     #region Implementations
 
     public async Task<Guid> Handle(CreateProductCommand command, CancellationToken cancellationToken)
@@ -91,7 +97,12 @@ public class CreateProductCommandHandler(IMapper mapper,
         entity.UpdateColors(dto.Colors?.Distinct().ToList(), command.Actor.ToString());
         entity.UpdateSizes(dto.Sizes?.Distinct().ToList(), command.Actor.ToString());
         entity.UpdateTags(dto.Tags?.Distinct().ToList(), command.Actor.ToString());
-        entity.UpdateSEO(dto.SEOTitle, dto.SEODescription, command.Actor.ToString());
+        // Without an explicit SEO title, fall back to the product name cut to the
+        // 60-character limit search engines show.
+        var seoTitle = dto.SEOTitle.IsNullOrWhiteSpace()
+            ? dto.Name!.Substring(0, SeoTitleMaxLength)
+            : dto.SEOTitle;
+        entity.UpdateSEO(seoTitle, dto.SEODescription, command.Actor.ToString());
         entity.UpdateFeatured(dto.Featured, command.Actor.ToString());
         entity.UpdateBarcode(dto.Barcode, command.Actor.ToString());
         entity.UpdateUnitAndWeight(dto.Unit, dto.Weight, command.Actor.ToString());
