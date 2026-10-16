@@ -97,12 +97,7 @@ public class CreateProductCommandHandler(IMapper mapper,
         entity.UpdateColors(dto.Colors?.Distinct().ToList(), command.Actor.ToString());
         entity.UpdateSizes(dto.Sizes?.Distinct().ToList(), command.Actor.ToString());
         entity.UpdateTags(dto.Tags?.Distinct().ToList(), command.Actor.ToString());
-        // Without an explicit SEO title, fall back to the product name cut to the
-        // 60-character limit search engines show.
-        var seoTitle = dto.SEOTitle.IsNullOrWhiteSpace()
-            ? dto.Name!.Substring(0, SeoTitleMaxLength)
-            : dto.SEOTitle;
-        entity.UpdateSEO(seoTitle, dto.SEODescription, command.Actor.ToString());
+        entity.UpdateSEO(ResolveSeoTitle(dto.SEOTitle, dto.Name!), dto.SEODescription, command.Actor.ToString());
         entity.UpdateFeatured(dto.Featured, command.Actor.ToString());
         entity.UpdateBarcode(dto.Barcode, command.Actor.ToString());
         entity.UpdateUnitAndWeight(dto.Unit, dto.Weight, command.Actor.ToString());
@@ -127,6 +122,17 @@ public class CreateProductCommandHandler(IMapper mapper,
     #endregion
 
     #region Methods
+
+    /// <summary>
+    ///     Without an explicit SEO title, fall back to the product name cut to the
+    ///     60-character limit search engines show.
+    /// </summary>
+    public static string? ResolveSeoTitle(string? seoTitle, string name)
+    {
+        return seoTitle.IsNullOrWhiteSpace()
+            ? name.Substring(0, Math.Min(name.Length, SeoTitleMaxLength))
+            : seoTitle;
+    }
 
     private async Task UploadThumbnailAsync(UploadFileBytes? image, ProductEntity entity, CancellationToken cancellationToken)
     {
