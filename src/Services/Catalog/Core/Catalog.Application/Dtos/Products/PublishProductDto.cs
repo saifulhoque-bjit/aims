@@ -6,6 +6,8 @@ public class PublishProductDto : ProductInfoDto
 
     public PublishProductImageDto? Thumbnail { get; set; }
 
+    public string? ThumbnailUrl { get; set; }
+
     public List<PublishProductImageDto>? Images { get; set; }
 
     #endregion

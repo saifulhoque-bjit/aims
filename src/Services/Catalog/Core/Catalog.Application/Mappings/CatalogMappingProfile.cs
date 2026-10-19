@@ -37,7 +37,8 @@ public sealed class CatalogMappingProfile : Profile
 
         // ProductEntity -> PublishProductDto
         CreateMap<ProductEntity, PublishProductDto>()
-            .ForMember(dest => dest.DisplayStatus, opt => opt.MapFrom(src => src.Status.GetDescription()));
+            .ForMember(dest => dest.DisplayStatus, opt => opt.MapFrom(src => src.Status.GetDescription()))
+            .ForMember(dest => dest.ThumbnailUrl, opt => opt.Ignore());
         // All other properties (including Status) auto-map by convention
 
         // ProductEntity -> GetProductByIdResult

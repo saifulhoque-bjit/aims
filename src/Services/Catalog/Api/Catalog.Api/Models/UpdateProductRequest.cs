@@ -24,6 +24,8 @@ public sealed class UpdateProductRequest
 
     public IFormFile? ThumbnailFile { get; set; }
 
+    public string? CurrentThumbnailUrl { get; set; }
+
     public Guid? BrandId { get; set; }
 
     public List<string>? Colors { get; set; }
