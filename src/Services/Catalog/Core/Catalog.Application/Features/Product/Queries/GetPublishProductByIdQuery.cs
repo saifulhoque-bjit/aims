@@ -30,6 +30,7 @@ public sealed class GetPublishProductByIdQueryHandler(IDocumentSession session, 
             .ToListAsync(cancellationToken);
 
         var reponse = mapper.Map<PublishProductDto>(result);
+        reponse.ThumbnailUrl = result.Thumbnail?.PublicURL;
 
         if (result.CategoryIds != null && result.CategoryIds.Count > 0)
         {

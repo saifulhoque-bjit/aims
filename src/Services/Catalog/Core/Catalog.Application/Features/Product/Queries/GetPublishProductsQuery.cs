@@ -54,6 +54,8 @@ public sealed class GetPublishProductsQueryHandler(IDocumentSession session, IMa
 
                 if (product == null) continue;
 
+                item.ThumbnailUrl = product.Thumbnail!.PublicURL;
+
                 if (product.CategoryIds != null && product.CategoryIds.Count > 0)
                 {
                     foreach (var categoryId in product.CategoryIds)

@@ -89,7 +89,7 @@ public class UpdateProductCommandHandler(IMapper mapper,
             performedBy: command.Actor.ToString());
 
         await UploadImagesAsync(dto.UploadImages, dto.CurrentImageUrls, entity, cancellationToken);
-        await UploadThumbnailAsync(dto.UploadThumbnail, entity, cancellationToken);
+        await UploadThumbnailAsync(dto.UploadThumbnail, dto.CurrentThumbnailUrl, entity, cancellationToken);
 
         entity.UpdateColors(dto.Colors?.Distinct().ToList(), command.Actor.ToString());
         entity.UpdateSizes(dto.Sizes?.Distinct().ToList(), command.Actor.ToString());
@@ -160,13 +160,20 @@ public class UpdateProductCommandHandler(IMapper mapper,
         entity.AddOrUpdateImages(newImages, currentImageUrls);
     }
 
-    private async Task UploadThumbnailAsync(UploadFileBytes? image, ProductEntity entity, CancellationToken cancellationToken)
+    private async Task UploadThumbnailAsync(
+        UploadFileBytes? image,
+        string? currentThumbnailUrl,
+        ProductEntity entity,
+        CancellationToken cancellationToken)
     {
-        if (image == null) return;
+        ProductImageEntity? uploaded = null;
+        if (image != null)
+        {
+            var result = await minIO.UploadFilesAsync([image], AppConstants.Bucket.Products, true, cancellationToken);
+            uploaded = mapper.Map<ProductImageEntity>(result.FirstOrDefault());
+        }
 
-        var result = await minIO.UploadFilesAsync([image], AppConstants.Bucket.Products, true, cancellationToken);
-        var thumbnail = result.FirstOrDefault();
-        entity.AddOrUpdateThumbnail(mapper.Map<ProductImageEntity>(thumbnail));
+        entity.ReplaceThumbnail(uploaded, currentThumbnailUrl);
     }
 
     private async Task ValidateCategoryAsync(List<Guid>? inputCategoryIds, CancellationToken cancellationToken = default)

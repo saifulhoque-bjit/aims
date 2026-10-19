@@ -166,6 +166,27 @@ public sealed class ProductEntity : Aggregate<Guid>
         Thumbnail = newImg;
     }
 
+    /// <summary>
+    ///     Applies the thumbnail from the product edit form: a new upload replaces the
+    ///     thumbnail, and the form's current thumbnail URL keeps it.
+    /// </summary>
+    public void ReplaceThumbnail(ProductImageEntity? newImg, string? currentImageUrl)
+    {
+        if (newImg != null)
+        {
+            Thumbnail = newImg;
+            return;
+        }
+
+        if (Thumbnail != null &&
+            string.Equals(Thumbnail.PublicURL, currentImageUrl, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        Thumbnail = null;
+    }
+
     public void Publish(string performedBy)
     {
         Published = true;
