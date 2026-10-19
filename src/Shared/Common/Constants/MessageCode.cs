@@ -222,6 +222,8 @@ public sealed class MessageCode
 
     public const string CategoryCannotBeItsOwnParent = "CATEGORY_CANNOT_BE_ITS_OWN_PARENT";
 
+    public const string CategoryCannotBeUnderItsDescendant = "CATEGORY_CANNOT_BE_UNDER_ITS_DESCENDANT";
+
     public const string MaxUsageIsRequired = "MAX_USAGE_IS_REQUIRED";
 
     public const string ValueIsRequired = "VALUE_IS_REQUIRED";
