@@ -64,6 +64,17 @@ public class UpdateCategoryCommandHandler(IDocumentSession session) : ICommandHa
             {
                 throw new ClientValidationException(MessageCode.CategoryIsNotExists, dto.ParentId.Value);
             }
+
+            // Cannot move a category under one of its own descendants
+            var parentIdsById = (await session.Query<CategoryEntity>()
+                    .Select(x => new { x.Id, x.ParentId })
+                    .ToListAsync(token: cancellationToken))
+                .ToDictionary(x => x.Id, x => x.ParentId);
+
+            if (CategoryHierarchy.WouldCreateCycle(command.CategoryId, dto.ParentId.Value, parentIdsById))
+            {
+                throw new ClientValidationException(MessageCode.CategoryCannotBeUnderItsDescendant, dto.ParentId.Value);
+            }
         }
 
         entity.Update(

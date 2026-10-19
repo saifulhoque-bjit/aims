@@ -962,6 +962,7 @@
     "CATEGORY_NAME_IS_REQUIRED": "Category name is required",
     "CATEGORY_HAS_CHILDREN": "Category has children and cannot be deleted",
     "CATEGORY_CANNOT_BE_ITS_OWN_PARENT": "Category cannot be its own parent",
+    "CATEGORY_CANNOT_BE_UNDER_ITS_DESCENDANT": "Category cannot be moved under one of its own subcategories",
     "MAX_USAGE_IS_REQUIRED": "Maximum usage is required",
     "VALUE_IS_REQUIRED": "Value is required",
     "PROGRAM_NAME_IS_REQUIRED": "Program name is required",
