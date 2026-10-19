@@ -89,7 +89,7 @@ public class UpdateProductCommandHandler(IMapper mapper,
             performedBy: command.Actor.ToString());
 
         await UploadImagesAsync(dto.UploadImages, dto.CurrentImageUrls, entity, cancellationToken);
-        await UploadThumbnailAsync(dto.UploadThumbnail, dto.CurrentThumbnailUrl, entity, cancellationToken);
+        await UploadThumbnailAsync(dto.UploadThumbnail, entity, cancellationToken);
 
         entity.UpdateColors(dto.Colors?.Distinct().ToList(), command.Actor.ToString());
         entity.UpdateSizes(dto.Sizes?.Distinct().ToList(), command.Actor.ToString());
@@ -162,7 +162,6 @@ public class UpdateProductCommandHandler(IMapper mapper,
 
     private async Task UploadThumbnailAsync(
         UploadFileBytes? image,
-        string? currentThumbnailUrl,
         ProductEntity entity,
         CancellationToken cancellationToken)
     {
@@ -173,7 +172,7 @@ public class UpdateProductCommandHandler(IMapper mapper,
             uploaded = mapper.Map<ProductImageEntity>(result.FirstOrDefault());
         }
 
-        entity.ReplaceThumbnail(uploaded, currentThumbnailUrl);
+        entity.ReplaceThumbnail(uploaded);
     }
 
     private async Task ValidateCategoryAsync(List<Guid>? inputCategoryIds, CancellationToken cancellationToken = default)
