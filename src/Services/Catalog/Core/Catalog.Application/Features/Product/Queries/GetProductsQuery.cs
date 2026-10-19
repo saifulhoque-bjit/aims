@@ -5,8 +5,10 @@ using Catalog.Application.Dtos.Products;
 using Catalog.Application.Models.Filters;
 using Catalog.Application.Models.Results;
 using Catalog.Domain.Entities;
+using Common.Configurations;
 using Marten;
 using Marten.Pagination;
+using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 
 #endregion
@@ -17,7 +19,7 @@ public sealed record GetProductsQuery(
     GetProductsFilter Filter,
     PaginationRequest Paging) : IQuery<GetProductsResult>;
 
-public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper mapper)
+public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper mapper, IConfiguration cfg)
     : IQueryHandler<GetProductsQuery, GetProductsResult>
 {
     #region Implementations
@@ -25,7 +27,9 @@ public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper ma
     public async Task<GetProductsResult> Handle(GetProductsQuery query, CancellationToken cancellationToken)
     {
         var filter = query.Filter;
-        var paging = query.Paging;
+        // A client may ask for any page size; never load more than the configured maximum.
+        var maxPageSize = cfg.GetValue<int>($"{PagingCfg.Section}:{PagingCfg.MaxPageSize}");
+        var paging = query.Paging with { PageSize = Math.Min(query.Paging.PageSize, maxPageSize) };
         var productQuery = session.Query<ProductEntity>().AsQueryable();
         Regex? relevance = null;
 
