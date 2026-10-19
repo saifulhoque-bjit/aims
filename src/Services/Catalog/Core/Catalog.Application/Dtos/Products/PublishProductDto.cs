@@ -10,5 +10,11 @@ public class PublishProductDto : ProductInfoDto
 
     public List<PublishProductImageDto>? Images { get; set; }
 
+    /// <summary>
+    /// Each category of the product as a breadcrumb, from the top-level category down,
+    /// for example "Electronics / Laptops".
+    /// </summary>
+    public List<string>? CategoryPaths { get; set; }
+
     #endregion
 }
