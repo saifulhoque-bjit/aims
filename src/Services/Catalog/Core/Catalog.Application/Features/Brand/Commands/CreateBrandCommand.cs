@@ -1,6 +1,7 @@
 #region using
 
 using Catalog.Application.Dtos.Brands;
+using Catalog.Application.Repositories;
 using Catalog.Domain.Entities;
 using Marten;
 
@@ -30,7 +31,7 @@ public class CreateBrandCommandValidator : AbstractValidator<CreateBrandCommand>
     #endregion
 }
 
-public class CreateBrandCommandHandler(IDocumentSession session) : ICommandHandler<CreateBrandCommand, Guid>
+public class CreateBrandCommandHandler(IDocumentSession session, ISlugRepository slugRepository) : ICommandHandler<CreateBrandCommand, Guid>
 {
     #region Implementations
 
@@ -40,10 +41,16 @@ public class CreateBrandCommandHandler(IDocumentSession session) : ICommandHandl
 
         await session.BeginTransactionAsync(cancellationToken);
 
+        var slug = dto.Name!.Slugify();
+        if (await slugRepository.BrandSlugExistsAsync(slug, cancellationToken: cancellationToken))
+        {
+            throw new ClientValidationException(MessageCode.BrandSlugAlreadyExists, slug);
+        }
+
         var entity = BrandEntity.Create(
             id: Guid.NewGuid(),
             name: dto.Name!,
-            slug: dto.Name!.Slugify(),
+            slug: slug,
             performedBy: command.Actor.ToString());
 
         session.Store(entity);

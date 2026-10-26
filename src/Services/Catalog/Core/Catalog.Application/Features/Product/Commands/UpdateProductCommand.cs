@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Catalog.Application.Dtos.Products;
+using Catalog.Application.Repositories;
 using Catalog.Application.Services;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Events;
@@ -60,7 +61,8 @@ public class UpdateProductCommandHandler(IMapper mapper,
     IDocumentSession session,
     IMinIOCloudService minIO,
     IMediator mediator,
-    ISender sender) : ICommandHandler<UpdateProductCommand, Guid>
+    ISender sender,
+    ISlugRepository slugRepository) : ICommandHandler<UpdateProductCommand, Guid>
 {
     #region Implementations
 
@@ -74,12 +76,19 @@ public class UpdateProductCommandHandler(IMapper mapper,
         var currentPublishStatus = entity.Published;
         var dto = command.Dto;
 
+        // The product's own slug is excluded, so a product may keep its current name.
+        var slug = dto.Name!.Slugify();
+        if (await slugRepository.ProductSlugExistsAsync(slug, entity.Id, cancellationToken))
+        {
+            throw new ClientValidationException(MessageCode.ProductSlugAlreadyExists, slug);
+        }
+
         await ValidateCategoryAsync(dto.CategoryIds, cancellationToken);
         await ValidateBrandAsync(dto.BrandId, cancellationToken);
 
         entity.Update(name: dto.Name!,
             sku: dto.Sku!,
-            slug: dto.Name!.Slugify(),
+            slug: slug,
             shortDescription: dto.ShortDescription!,
             longDescription: dto.LongDescription!,
             price: dto.Price,
