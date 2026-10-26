@@ -222,6 +222,12 @@ public sealed class MessageCode
 
     public const string CategoryCannotBeItsOwnParent = "CATEGORY_CANNOT_BE_ITS_OWN_PARENT";
 
+    public const string BrandSlugAlreadyExists = "BRAND_SLUG_ALREADY_EXISTS";
+
+    public const string CategorySlugAlreadyExists = "CATEGORY_SLUG_ALREADY_EXISTS";
+
+    public const string ProductSlugAlreadyExists = "PRODUCT_SLUG_ALREADY_EXISTS";
+
     public const string MaxUsageIsRequired = "MAX_USAGE_IS_REQUIRED";
 
     public const string ValueIsRequired = "VALUE_IS_REQUIRED";

@@ -1,6 +1,7 @@
 #region using
 
 using Catalog.Application.Dtos.Categories;
+using Catalog.Application.Repositories;
 using Catalog.Domain.Entities;
 using Marten;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ public class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCo
     #endregion
 }
 
-public class UpdateCategoryCommandHandler(IDocumentSession session) : ICommandHandler<UpdateCategoryCommand, Guid>
+public class UpdateCategoryCommandHandler(IDocumentSession session, ISlugRepository slugRepository) : ICommandHandler<UpdateCategoryCommand, Guid>
 {
     #region Implementations
 
@@ -47,6 +48,13 @@ public class UpdateCategoryCommandHandler(IDocumentSession session) : ICommandHa
             ?? throw new ClientValidationException(MessageCode.CategoryIsNotExists, command.CategoryId);
 
         var dto = command.Dto;
+
+        // The category's own slug is excluded, so a category may keep its current name.
+        var slug = dto.Name!.Slugify();
+        if (await slugRepository.CategorySlugExistsAsync(slug, entity.Id, cancellationToken))
+        {
+            throw new ClientValidationException(MessageCode.CategorySlugAlreadyExists, slug);
+        }
 
         // Validate ParentId if provided
         if (dto.ParentId.HasValue)
@@ -69,7 +77,7 @@ public class UpdateCategoryCommandHandler(IDocumentSession session) : ICommandHa
         entity.Update(
             name: dto.Name!,
             desciption: dto.Description ?? string.Empty,
-            slug: dto.Name!.Slugify(),
+            slug: slug,
             performedBy: command.Actor.ToString(),
             parentId: dto.ParentId);
 

@@ -1,6 +1,7 @@
 #region using
 
 using Catalog.Application.Dtos.Categories;
+using Catalog.Application.Repositories;
 using Catalog.Domain.Entities;
 using Marten;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,7 @@ public class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCo
     #endregion
 }
 
-public class CreateCategoryCommandHandler(IDocumentSession session) : ICommandHandler<CreateCategoryCommand, Guid>
+public class CreateCategoryCommandHandler(IDocumentSession session, ISlugRepository slugRepository) : ICommandHandler<CreateCategoryCommand, Guid>
 {
     #region Implementations
 
@@ -40,6 +41,12 @@ public class CreateCategoryCommandHandler(IDocumentSession session) : ICommandHa
         var dto = command.Dto;
 
         await session.BeginTransactionAsync(cancellationToken);
+
+        var slug = dto.Name!.Slugify();
+        if (await slugRepository.CategorySlugExistsAsync(slug, cancellationToken: cancellationToken))
+        {
+            throw new ClientValidationException(MessageCode.CategorySlugAlreadyExists, slug);
+        }
 
         // Validate ParentId if provided
         if (dto.ParentId.HasValue)
@@ -57,7 +64,7 @@ public class CreateCategoryCommandHandler(IDocumentSession session) : ICommandHa
             id: Guid.NewGuid(),
             name: dto.Name!,
             desctiption: dto.Description ?? string.Empty,
-            slug: dto.Name!.Slugify(),
+            slug: slug,
             performedBy: command.Actor.ToString(),
             parentId: dto.ParentId);
 

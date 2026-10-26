@@ -1,6 +1,7 @@
 #region using
 
 using Catalog.Application.Dtos.Brands;
+using Catalog.Application.Repositories;
 using Catalog.Domain.Entities;
 using Marten;
 
@@ -34,7 +35,7 @@ public class UpdateBrandCommandValidator : AbstractValidator<UpdateBrandCommand>
     #endregion
 }
 
-public class UpdateBrandCommandHandler(IDocumentSession session) : ICommandHandler<UpdateBrandCommand, Guid>
+public class UpdateBrandCommandHandler(IDocumentSession session, ISlugRepository slugRepository) : ICommandHandler<UpdateBrandCommand, Guid>
 {
     #region Implementations
 
@@ -47,9 +48,16 @@ public class UpdateBrandCommandHandler(IDocumentSession session) : ICommandHandl
 
         var dto = command.Dto;
 
+        // The brand's own slug is excluded, so a brand may keep its current name.
+        var slug = dto.Name!.Slugify();
+        if (await slugRepository.BrandSlugExistsAsync(slug, entity.Id, cancellationToken))
+        {
+            throw new ClientValidationException(MessageCode.BrandSlugAlreadyExists, slug);
+        }
+
         entity.Update(
             name: dto.Name!,
-            slug: dto.Name!.Slugify(),
+            slug: slug,
             performedBy: command.Actor.ToString());
 
         session.Store(entity);

@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Catalog.Application.Dtos.Products;
+using Catalog.Application.Repositories;
 using Catalog.Application.Services;
 using Catalog.Domain.Entities;
 using Marten;
@@ -59,7 +60,8 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
 public class CreateProductCommandHandler(IMapper mapper,
     IDocumentSession session,
     IMinIOCloudService minIO,
-    ISender sender) : ICommandHandler<CreateProductCommand, Guid>
+    ISender sender,
+    ISlugRepository slugRepository) : ICommandHandler<CreateProductCommand, Guid>
 {
     #region Fields, Properties and Indexers
 
@@ -75,6 +77,12 @@ public class CreateProductCommandHandler(IMapper mapper,
 
         await session.BeginTransactionAsync(cancellationToken);
 
+        var slug = dto.Name!.Slugify();
+        if (await slugRepository.ProductSlugExistsAsync(slug, cancellationToken: cancellationToken))
+        {
+            throw new ClientValidationException(MessageCode.ProductSlugAlreadyExists, slug);
+        }
+
         await ValidateCategoryAsync(dto.CategoryIds, cancellationToken);
         await ValidateBrandAsync(dto.BrandId, cancellationToken);
 
@@ -82,7 +90,7 @@ public class CreateProductCommandHandler(IMapper mapper,
             id: Guid.NewGuid(),
             name: dto.Name!,
             sku: dto.Sku!,
-            slug: dto.Name!.Slugify(),
+            slug: slug,
             shortDescription: dto.ShortDescription!,
             longDescription: dto.LongDescription!,
             price: dto.Price,
