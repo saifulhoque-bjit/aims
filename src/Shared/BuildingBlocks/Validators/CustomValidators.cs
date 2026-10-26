@@ -11,9 +11,21 @@ public static class CustomValidators
 {
     #region Methods
 
+    /// <summary>
+    /// Validates that the list is not null and has at least <paramref name="num"/> items.
+    /// </summary>
+    /// <typeparam name="T">The type being validated</typeparam>
+    /// <typeparam name="TElement">The list element type</typeparam>
+    /// <param name="ruleBuilder">The rule builder</param>
+    /// <param name="num">The minimum number of items; must not be negative</param>
+    /// <returns>Rule builder options</returns>
     public static IRuleBuilderOptions<T, IList<TElement>> MustHave<T, TElement>(this IRuleBuilder<T, IList<TElement>> ruleBuilder, int num)
     {
-        return ruleBuilder.NotNull();
+        ArgumentOutOfRangeException.ThrowIfNegative(num);
+
+        return ruleBuilder
+            .Must(list => list != null && list.Count >= num)
+            .WithMessage($"'{{PropertyName}}' must have at least {num} item(s).");
     }
 
     /// <summary>
