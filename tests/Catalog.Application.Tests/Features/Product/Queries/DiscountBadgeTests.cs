@@ -48,6 +48,32 @@ public class DiscountBadgeTests
         Assert.Equal("(-50% off)", result);
     }
 
+    // SPEC: spec-07612b - the badge states the discount as a whole percentage.
+    [Theory]
+    [InlineData(100, 66.67, "(-33% off)")]
+    [InlineData(300, 200, "(-33% off)")]
+    [InlineData(100, 33.4, "(-67% off)")]
+    [InlineData(200, 99, "(-51% off)")]
+    [InlineData(1000, 995, "(-1% off)")]
+    public void Build_ReturnsWholePercentage(double price, double salePrice, string expected)
+    {
+        var result = DiscountBadge.Build((decimal)price, (decimal)salePrice);
+
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData(100, 66.67)]
+    [InlineData(300, 200)]
+    [InlineData(7, 3)]
+    public void Build_BadgeHasNoDecimalDigits(double price, double salePrice)
+    {
+        var result = DiscountBadge.Build((decimal)price, (decimal)salePrice);
+
+        Assert.NotNull(result);
+        Assert.Matches(@"^\(-\d+% off\)$", result);
+    }
+
     [Fact]
     public void Build_DoesNotThrow_ForZeroSalePrice()
     {

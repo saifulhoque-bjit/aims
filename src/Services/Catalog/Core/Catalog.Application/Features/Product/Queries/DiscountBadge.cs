@@ -24,9 +24,11 @@ public static class DiscountBadge
             return null;
         }
 
-        var discountPercentage = (price - salePrice.Value) / price * 100;
+        // SPEC: spec-07612b - whole percentages only (away from zero at .5), matching
+        // the storefront and price rules.
+        var discountPercentage = Math.Round((price - salePrice.Value) / price * 100, 0, MidpointRounding.AwayFromZero);
 
-        return $"(-{discountPercentage:0.##}% off)";
+        return $"(-{discountPercentage:0}% off)";
     }
 
     #endregion
