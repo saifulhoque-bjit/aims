@@ -18,9 +18,16 @@ public static class NumericExtension
 
     public static string ToFileSize(this long value)
     {
+        if (value < 1024)
+        {
+            return $"{value} {FileSizeSuffixes[0]}";
+        }
+
+        // Compare the unrounded value: rounding number / 1024 moved anything over
+        // half a unit up (600 -> "0.6 KB"). Stop at the last suffix (PB).
         int counter = 0;
         decimal number = value;
-        while (Math.Round(number / 1024) >= 1)
+        while (number >= 1024 && counter < FileSizeSuffixes.Length - 1)
         {
             number /= 1024;
             counter++;
