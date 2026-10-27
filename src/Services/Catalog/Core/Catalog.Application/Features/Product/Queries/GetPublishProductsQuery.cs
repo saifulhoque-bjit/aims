@@ -1,6 +1,7 @@
 ﻿#region using
 
 using AutoMapper;
+using BuildingBlocks.Pagination.Extensions;
 using Catalog.Application.Dtos.Products;
 using Catalog.Application.Models.Filters;
 using Catalog.Application.Models.Results;
@@ -24,7 +25,8 @@ public sealed class GetPublishProductsQueryHandler(IDocumentSession session, IMa
     public async Task<GetPublishProductsResult> Handle(GetPublishProductsQuery query, CancellationToken cancellationToken)
     {
         var filter = query.Filter;
-        var paging = query.Paging;
+        // SPEC: spec-61ecda
+        var paging = query.Paging.Normalized();
         var productQuery = session.Query<ProductEntity>().Where(x => x.Published);
 
         if (!filter.SearchText.IsNullOrWhiteSpace())

@@ -39,6 +39,16 @@ public static class PagingExtensions
         return (int)Math.Ceiling(totalCount / (double)paging.PageSize);
     }
 
+    // SPEC: spec-61ecda
+    // The same normalisation WithPaging applies, for callers that page through another API.
+    public static PaginationRequest Normalized(this PaginationRequest paging)
+    {
+        if (paging is null) throw new ArgumentNullException(nameof(paging));
+
+        var (pageNumber, pageSize, _) = Normalize(paging);
+        return paging with { PageNumber = pageNumber, PageSize = pageSize };
+    }
+
     private static (int pageNumber, int pageSize, int skip) Normalize(PaginationRequest paging)
     {
         var pageNumber = paging.PageNumber <= 0 ? 1 : paging.PageNumber;

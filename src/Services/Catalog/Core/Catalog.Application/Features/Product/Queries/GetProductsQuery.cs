@@ -1,6 +1,7 @@
 ﻿#region using
 
 using AutoMapper;
+using BuildingBlocks.Pagination.Extensions;
 using Catalog.Application.Dtos.Products;
 using Catalog.Application.Models.Filters;
 using Catalog.Application.Models.Results;
@@ -27,9 +28,8 @@ public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper ma
     public async Task<GetProductsResult> Handle(GetProductsQuery query, CancellationToken cancellationToken)
     {
         var filter = query.Filter;
-        // A client may ask for any page size; never load more than the configured maximum.
         var maxPageSize = cfg.GetValue<int>($"{PagingCfg.Section}:{PagingCfg.MaxPageSize}");
-        var paging = query.Paging with { PageSize = Math.Min(query.Paging.PageSize, maxPageSize) };
+        var paging = ResolvePaging(query.Paging, maxPageSize);
         var productQuery = session.Query<ProductEntity>().AsQueryable();
         Regex? relevance = null;
 
@@ -103,6 +103,21 @@ public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper ma
         var reponse = new GetProductsResult(items, totalCount, paging);
 
         return reponse;
+    }
+
+    #endregion
+
+    #region Methods
+
+    // SPEC: spec-61ecda
+    // A client may ask for any page size; never load more than the configured maximum.
+    // A missing or non-positive maximum is no cap, so it cannot force the page size to 0.
+    public static PaginationRequest ResolvePaging(PaginationRequest paging, int maxPageSize)
+    {
+        var normalized = paging.Normalized();
+        return maxPageSize > 0 && normalized.PageSize > maxPageSize
+            ? normalized with { PageSize = maxPageSize }
+            : normalized;
     }
 
     #endregion
