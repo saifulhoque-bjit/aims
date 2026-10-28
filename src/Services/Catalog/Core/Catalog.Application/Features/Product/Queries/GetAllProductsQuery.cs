@@ -21,7 +21,17 @@ public sealed class GetAllProductsQueryHandler(IDocumentSession session, IMapper
     public async Task<GetAllProductsResult> Handle(GetAllProductsQuery query, CancellationToken cancellationToken)
     {
         var filter = query.Filter;
-        var productQuery = ProductListFilter.Apply(session.Query<ProductEntity>(), filter);
+        var productQuery = session.Query<ProductEntity>().AsQueryable();
+
+        if (!filter.SearchText.IsNullOrWhiteSpace())
+        {
+            var search = filter.SearchText.Trim();
+            productQuery = productQuery.Where(x => x.Name != null && x.Name.Contains(search));
+        }
+        if (filter.Ids?.Length > 0)
+        {
+            productQuery = productQuery.Where(x => filter.Ids.Contains(x.Id));
+        }
 
         var result = await productQuery
             .OrderByDescending(x => x.CreatedOnUtc)
