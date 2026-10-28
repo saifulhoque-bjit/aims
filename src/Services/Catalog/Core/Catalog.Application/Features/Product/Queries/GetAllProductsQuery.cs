@@ -42,7 +42,20 @@ public sealed class GetAllProductsQueryHandler(IDocumentSession session, IMapper
 
                 if (product == null) continue;
 
-                ProductCategories.Fill(item, product.CategoryIds, categories);
+                if (product.CategoryIds != null && product.CategoryIds.Count > 0)
+                {
+                    foreach (var categoryId in product.CategoryIds)
+                    {
+                        var category = categories.FirstOrDefault(c => c.Id == categoryId);
+                        if (category != null)
+                        {
+                            item.CategoryNames ??= [];
+                            item.CategoryNames.Add(category.Name!);
+                            item.CategoryIds ??= [];
+                            item.CategoryIds.Add(category.Id);
+                        }
+                    }
+                }
 
                 if (product.BrandId.HasValue)
                 {
