@@ -26,26 +26,19 @@ public static class NumericExtension
     public static string ToShortNumber(this int value)
     {
         const string baseString = "k";
-        string toString = $"{value:#,##0.##}";
         if (value < 1000)
         {
             return value.ToString();
         }
 
-        string s1 = toString.Split(",")[0];
-        string s2 = toString.Split(",")[1];
+        // Arithmetic, not split at group separators: "1,234,567" kept only its
+        // first two groups and read as thousands ("1.2k").
+        int thousands = value / 1000;
+        int tenths = value % 1000 / 100;
 
-        string str;
-        if (int.Parse(s2) > 99)
-        {
-            str = string.Concat(s1, ".", s2.AsSpan(0, s2.Length - 2), baseString);
-        }
-        else
-        {
-            str = s1 + baseString;
-        }
-
-        return str;
+        return tenths > 0
+            ? $"{thousands}.{tenths}{baseString}"
+            : thousands + baseString;
     }
 
     public static TEnum? ToEnum<TEnum>(this int value) where TEnum : struct, Enum
