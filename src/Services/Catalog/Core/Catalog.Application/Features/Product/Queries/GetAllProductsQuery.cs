@@ -21,7 +21,17 @@ public sealed class GetAllProductsQueryHandler(IDocumentSession session, IMapper
     public async Task<GetAllProductsResult> Handle(GetAllProductsQuery query, CancellationToken cancellationToken)
     {
         var filter = query.Filter;
-        var productQuery = ProductListFilter.Apply(session.Query<ProductEntity>(), filter);
+        var productQuery = session.Query<ProductEntity>().AsQueryable();
+
+        if (!filter.SearchText.IsNullOrWhiteSpace())
+        {
+            var search = filter.SearchText.Trim();
+            productQuery = productQuery.Where(x => x.Name != null && x.Name.Contains(search));
+        }
+        if (filter.Ids?.Length > 0)
+        {
+            productQuery = productQuery.Where(x => filter.Ids.Contains(x.Id));
+        }
 
         var result = await productQuery
             .OrderByDescending(x => x.CreatedOnUtc)
@@ -42,7 +52,20 @@ public sealed class GetAllProductsQueryHandler(IDocumentSession session, IMapper
 
                 if (product == null) continue;
 
-                ProductCategories.Fill(item, product.CategoryIds, categories);
+                if (product.CategoryIds != null && product.CategoryIds.Count > 0)
+                {
+                    foreach (var categoryId in product.CategoryIds)
+                    {
+                        var category = categories.FirstOrDefault(c => c.Id == categoryId);
+                        if (category != null)
+                        {
+                            item.CategoryNames ??= [];
+                            item.CategoryNames.Add(category.Name!);
+                            item.CategoryIds ??= [];
+                            item.CategoryIds.Add(category.Id);
+                        }
+                    }
+                }
 
                 if (product.BrandId.HasValue)
                 {

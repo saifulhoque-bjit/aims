@@ -1,10 +1,4 @@
-﻿#region using
-
-using System.Globalization;
-
-#endregion
-
-namespace Common.Extensions;
+﻿namespace Common.Extensions;
 
 public static class NumericExtension
 {
@@ -18,16 +12,9 @@ public static class NumericExtension
 
     public static string ToFileSize(this long value)
     {
-        if (value < 1024)
-        {
-            return $"{value} {FileSizeSuffixes[0]}";
-        }
-
-        // Compare the unrounded value: rounding number / 1024 moved anything over
-        // half a unit up (600 -> "0.6 KB"). Stop at the last suffix (PB).
         int counter = 0;
         decimal number = value;
-        while (number >= 1024 && counter < FileSizeSuffixes.Length - 1)
+        while (Math.Round(number / 1024) >= 1)
         {
             number /= 1024;
             counter++;
@@ -36,23 +23,29 @@ public static class NumericExtension
         return $"{number:n1} {FileSizeSuffixes[counter]}";
     }
 
-    // SPEC: spec-a7ad8e
     public static string ToShortNumber(this int value)
     {
         const string baseString = "k";
+        string toString = $"{value:#,##0.##}";
         if (value < 1000)
         {
-            return value.ToString(CultureInfo.InvariantCulture);
+            return value.ToString();
         }
 
-        // Arithmetic, not a culture-formatted string: splitting "1,234,567" at its
-        // group separators cut a million or more down to its first group.
-        int thousands = value / 1000;
-        int tenths = value % 1000 / 100;
+        string s1 = toString.Split(",")[0];
+        string s2 = toString.Split(",")[1];
 
-        return tenths > 0
-            ? string.Create(CultureInfo.InvariantCulture, $"{thousands}.{tenths}{baseString}")
-            : string.Create(CultureInfo.InvariantCulture, $"{thousands}{baseString}");
+        string str;
+        if (int.Parse(s2) > 99)
+        {
+            str = string.Concat(s1, ".", s2.AsSpan(0, s2.Length - 2), baseString);
+        }
+        else
+        {
+            str = s1 + baseString;
+        }
+
+        return str;
     }
 
     public static TEnum? ToEnum<TEnum>(this int value) where TEnum : struct, Enum
