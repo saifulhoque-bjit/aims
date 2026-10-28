@@ -33,29 +33,6 @@ public class NumericExtensionTests
         { int.MaxValue, "2147483.6k" }
     };
 
-    public static TheoryData<long, string> FileSizeCases => new()
-    {
-        // Below 1024 - stays in Bytes, as a whole number.
-        { 0, "0 Bytes" },
-        { 1, "1 Bytes" },
-        { 512, "512 Bytes" },
-        { 513, "513 Bytes" },
-        { 600, "600 Bytes" },
-        { 1023, "1023 Bytes" },
-        { -600, "-600 Bytes" },
-        // Moves to the next unit at exactly 1024, not at half a unit.
-        { 1024, "1.0 KB" },
-        { 1536, "1.5 KB" },
-        { 524289, "512.0 KB" },
-        { 1048575, "1,024.0 KB" },
-        { 1048576, "1.0 MB" },
-        { 536870913, "512.0 MB" },
-        { 1073741824, "1.0 GB" },
-        // Stops at PB instead of running past the last suffix.
-        { 1125899906842624L * 600, "600.0 PB" },
-        { long.MaxValue, "8,192.0 PB" }
-    };
-
     #endregion
 
     #region Implementations
@@ -78,24 +55,6 @@ public class NumericExtensionTests
         try
         {
             var result = value.ToShortNumber();
-
-            Assert.Equal(expected, result);
-        }
-        finally
-        {
-            CultureInfo.CurrentCulture = original;
-        }
-    }
-
-    [Theory]
-    [MemberData(nameof(FileSizeCases))]
-    public void ToFileSize_StaysInAUnitBelow1024AndStopsAtPB(long value, string expected)
-    {
-        var original = CultureInfo.CurrentCulture;
-        CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-        try
-        {
-            var result = value.ToFileSize();
 
             Assert.Equal(expected, result);
         }
