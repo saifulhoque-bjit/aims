@@ -36,7 +36,8 @@ public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper ma
         if (!filter.SearchText.IsNullOrWhiteSpace())
         {
             var search = filter.SearchText.Trim();
-            relevance = new Regex(search, RegexOptions.IgnoreCase);
+            // Search text is literal user input (e.g. "c++"), never a pattern.
+            relevance = new Regex(Regex.Escape(search), RegexOptions.IgnoreCase);
             productQuery = productQuery.Where(x => x.Name != null && x.Name.Contains(search));
         }
         if (filter.Ids?.Length > 0)
