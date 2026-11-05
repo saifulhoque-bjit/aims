@@ -9,7 +9,6 @@ using Common.Configurations;
 using Marten;
 using Marten.Pagination;
 using Microsoft.Extensions.Configuration;
-using System.Text.RegularExpressions;
 
 #endregion
 
@@ -31,12 +30,12 @@ public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper ma
         var maxPageSize = cfg.GetValue<int>($"{PagingCfg.Section}:{PagingCfg.MaxPageSize}");
         var paging = query.Paging with { PageSize = Math.Min(query.Paging.PageSize, maxPageSize) };
         var productQuery = session.Query<ProductEntity>().AsQueryable();
-        Regex? relevance = null;
+        string? search = null;
 
         if (!filter.SearchText.IsNullOrWhiteSpace())
         {
-            var search = filter.SearchText.Trim();
-            relevance = new Regex(search, RegexOptions.IgnoreCase);
+            // SPEC: spec-87f298 - the search text is plain text, never a regex pattern.
+            search = filter.SearchText.Trim();
             productQuery = productQuery.Where(x => x.Name != null && x.Name.Contains(search));
         }
         if (filter.Ids?.Length > 0)
@@ -93,10 +92,10 @@ public sealed class GetProductsQueryHandler(IDocumentSession session, IMapper ma
         }
 
         // Names where the search text matches earliest come first on the page.
-        if (relevance != null)
+        if (search != null)
         {
             items = items
-                .OrderBy(i => relevance.Match(i.Name ?? string.Empty) is { Success: true } m ? m.Index : int.MaxValue)
+                .OrderBy(i => ProductSearchRanking.MatchPosition(i.Name, search))
                 .ToList();
         }
 
